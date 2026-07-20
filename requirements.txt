@@ -1,0 +1,10 @@
+# Core — no paid API keys required for any of this.
+# SQLite is stdlib (sqlite3), no driver needed.
+
+# Optional: only needed if you plug in a local LLM via Ollama for richer NL->SQL.
+# The template-based NL->SQL engine (agent/nlsql.py) works with zero extra installs.
+# requests>=2.31
+
+# Optional: only needed if you want to push the mock catalog into a REAL local
+# DataHub instance (docker quickstart) instead of using the bundled mock catalog.
+# acryl-datahub>=0.13.0

@@ -1,0 +1,96 @@
+{
+  "_comment": "Mock DataHub metadata graph. Shaped like real DataHub entities (urns, datasets, schemaFields, upstream lineage, glossary terms, ownership) so this file can be swapped for a live DataHub GMS instance with no code changes beyond catalog/datahub_client.py. See README.md 'Using a real DataHub instance'.",
+
+  "datasets": [
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.customers,PROD)",
+      "name": "customers",
+      "description": "One row per registered customer. Source of truth for customer identity and region.",
+      "owners": ["orbitboyzz-data-team"],
+      "glossaryTerms": ["PII.Email", "Customer"],
+      "schemaFields": [
+        {"name": "customer_id", "type": "number", "description": "Primary key."},
+        {"name": "first_name", "type": "string", "description": "Customer first name."},
+        {"name": "last_name", "type": "string", "description": "Customer last name."},
+        {"name": "email", "type": "string", "description": "Contact email. Classified PII.", "glossaryTerms": ["PII.Email"]},
+        {"name": "signup_date", "type": "date", "description": "Date the customer account was created."},
+        {"name": "region", "type": "string", "description": "Sales region: Northeast, Midwest, South, or West."}
+      ],
+      "upstreamLineage": []
+    },
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.products,PROD)",
+      "name": "products",
+      "description": "Product catalog with current unit price and category.",
+      "owners": ["orbitboyzz-data-team"],
+      "glossaryTerms": ["Product"],
+      "schemaFields": [
+        {"name": "product_id", "type": "number", "description": "Primary key."},
+        {"name": "name", "type": "string", "description": "Product display name."},
+        {"name": "category", "type": "string", "description": "One of: Electronics, Home & Kitchen, Sports, Books, Toys."},
+        {"name": "unit_price", "type": "number", "description": "Current list price in USD."}
+      ],
+      "upstreamLineage": []
+    },
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.orders,PROD)",
+      "name": "orders",
+      "description": "One row per customer order (header level). Does not contain line-item detail - see order_items.",
+      "owners": ["orbitboyzz-data-team"],
+      "glossaryTerms": ["Order"],
+      "schemaFields": [
+        {"name": "order_id", "type": "number", "description": "Primary key."},
+        {"name": "customer_id", "type": "number", "description": "Foreign key to customers.customer_id."},
+        {"name": "order_date", "type": "date", "description": "Date the order was placed."},
+        {"name": "status", "type": "string", "description": "One of: completed, cancelled, returned."}
+      ],
+      "upstreamLineage": [
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.customers,PROD)", "type": "foreign_key"}
+      ]
+    },
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.order_items,PROD)",
+      "name": "order_items",
+      "description": "Line-item detail for each order: which product, how many, at what price. Revenue must be computed as quantity * unit_price and summed - there is no pre-aggregated revenue column.",
+      "owners": ["orbitboyzz-data-team"],
+      "glossaryTerms": ["Revenue"],
+      "schemaFields": [
+        {"name": "order_item_id", "type": "number", "description": "Primary key."},
+        {"name": "order_id", "type": "number", "description": "Foreign key to orders.order_id."},
+        {"name": "product_id", "type": "number", "description": "Foreign key to products.product_id."},
+        {"name": "quantity", "type": "number", "description": "Units purchased in this line item."},
+        {"name": "unit_price", "type": "number", "description": "Price at time of purchase (may differ from current products.unit_price)."}
+      ],
+      "upstreamLineage": [
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.orders,PROD)", "type": "foreign_key"},
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.products,PROD)", "type": "foreign_key"}
+      ]
+    },
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:report,sample_db.monthly_revenue_report,PROD)",
+      "name": "monthly_revenue_report",
+      "description": "Derived reporting view: total revenue and order count per month per category. Rebuilt nightly from order_items joined to products and orders.",
+      "owners": ["orbitboyzz-analytics-team"],
+      "glossaryTerms": ["Revenue"],
+      "schemaFields": [
+        {"name": "month", "type": "date", "description": "Calendar month."},
+        {"name": "category", "type": "string", "description": "Product category."},
+        {"name": "total_revenue", "type": "number", "description": "SUM(quantity * unit_price) for completed orders."},
+        {"name": "order_count", "type": "number", "description": "COUNT(DISTINCT order_id)."}
+      ],
+      "upstreamLineage": [
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.order_items,PROD)", "type": "transform"},
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.products,PROD)", "type": "transform"},
+        {"upstreamUrn": "urn:li:dataset:(urn:li:dataPlatform:sqlite,sample_db.orders,PROD)", "type": "transform"}
+      ]
+    }
+  ],
+
+  "glossaryTerms": [
+    {"urn": "PII.Email", "name": "Email (PII)", "description": "Personally identifiable contact information. Handle per data-privacy policy."},
+    {"urn": "Customer", "name": "Customer", "description": "An individual who has registered an account."},
+    {"urn": "Product", "name": "Product", "description": "A sellable catalog item."},
+    {"urn": "Order", "name": "Order", "description": "A customer's request to purchase one or more products."},
+    {"urn": "Revenue", "name": "Revenue", "description": "Money earned from completed sales, computed as quantity * unit_price, summed across order_items."}
+  ]
+}
