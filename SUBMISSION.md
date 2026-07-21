@@ -46,13 +46,12 @@ included ingestion script, with no code changes to the agent itself.
 
 ## Links
 
-- GitHub repo: *(paste repo URL once pushed)*
+- GitHub repo: https://github.com/orbitwebsites-cloud/datahub-sql-agent
 - Demo video: *(paste video URL once recorded — see DEMO.md for the script)*
 
 ## Notes for future me before submitting
 
-- [ ] Push this repo to GitHub (currently only local git init'd in
-      D:\Hackathons2026\datahub-sql-agent)
+- [x] Push this repo to GitHub — done: https://github.com/orbitwebsites-cloud/datahub-sql-agent
 - [ ] Record the demo video following DEMO.md
 - [ ] Double check hackathon rules for any required team info / eligibility fields
 - [ ] Confirm the exact category/track this should be submitted under on Devpost
