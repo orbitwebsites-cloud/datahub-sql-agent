@@ -3,3 +3,13 @@ __pycache__/
 .pytest_cache/
 data/sample.db
 .env
+
+# Demo video + its generated intermediate artifacts (regenerate via
+# recording/gen_narration.ps1 -> recording/build_audio.sh -> recording/render_frames.py).
+# Kept on disk, not committed - see recording/README.md.
+DEMO_VIDEO.mp4
+recording/*.wav
+recording/frames/
+recording/*.mp4
+recording/*.txt
+recording/*.marker
